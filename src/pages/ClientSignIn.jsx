@@ -9,35 +9,37 @@ const ClientSignIn = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { signOut } = useClerk() ;
+  const { signOut } = useClerk();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isLoaded) return;
 
     try {
-      await signOut()
-
-
       const result = await signIn.attemptFirstFactor({
         strategy: "password",
         identifier: email,
         password,
-        redirectUrlComplete: "/client-dashboard",
       });
 
-      if (result.status === "complete") {
+      console.log("Sign-in result:", result);
+
+      if (result.status === "complete" && result.createdSessionId) {
         await setActive({ session: result.createdSessionId });
+        console.log("Session set, navigating...");
         navigate("/client-dashboard", { replace: true });
-        console.log("After completing session")
+      } else {
+        setError("Login failed. Please check your credentials.");
       }
     } catch (err) {
-      setError(err.errors?.[0]?.message || "Something went wrong. Please try again.");
+      setError(
+        err.errors?.[0]?.message || "Something went wrong. Please try again."
+      );
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-rose-600">
           Welcome to Mother's Tiffin
@@ -57,7 +59,10 @@ const ClientSignIn = () => {
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <div className="mt-1">
@@ -75,7 +80,10 @@ const ClientSignIn = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1">
@@ -108,7 +116,9 @@ const ClientSignIn = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -117,14 +127,13 @@ const ClientSignIn = () => {
             </div>
           </div>
 
-
-
-          
-
           <div className="mt-6 text-center text-sm text-gray-600">
             <p>
               New to Mother's Tiffin?{" "}
-              <a href="/signup-client" className="font-medium text-rose-600 hover:text-rose-500">
+              <a
+                href="/signup-client"
+                className="font-medium text-rose-600 hover:text-rose-500"
+              >
                 Create an account
               </a>
             </p>
@@ -135,9 +144,6 @@ const ClientSignIn = () => {
   );
 };
 
-
-
-
 const GoogleSignInButton = () => {
   const { signIn } = useSignIn();
   const { signOut } = useClerk();
@@ -146,7 +152,6 @@ const GoogleSignInButton = () => {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-
       await signOut();
 
       await signIn.authenticateWithRedirect({

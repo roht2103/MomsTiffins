@@ -10,22 +10,23 @@ import ClientSignIn from "./pages/ClientSignIn";
 
 import NavBar from "./components/Navbar";
 import React from "react";
-import Role from "./pages/Role"
+import Role from "./pages/Role";
 import SSOCallback from "./pages/SSOCallback";
 import SignupClient from "./pages/SignupClient";
 import MotherSignin from "./pages/MotherSignin";
 import MotherSignup from "./pages/MotherSignup";
 import SSOCallbackMother from "./pages/SSOForMother";
 
-// const Layout = () => (
-//   <div>
-//     <NavBar />
-//     <main>
-//       <Outlet />{" "}
-//       {/* This is the key change - using Outlet instead of {children} */}
-//     </main>
-//   </div>
-// );
+const Layout = () => (
+  <div>
+    <NavBar />
+    <main className="pt-16">
+      {" "}
+      {/* Adjust padding if NavBar overlaps content */}
+      <Outlet />
+    </main>
+  </div>
+);
 
 const App = () => {
   // const { isSignedIn } = useAuth();
@@ -50,17 +51,21 @@ const App = () => {
 
   return (
     <Routes>
-      
-
-      <Route path="/" element={<Role />}>1 </Route>
-      <Route path="/signin-client" element={<ClientSignIn />} />
-      <Route path="/sso-callback" element={<SSOCallback />} />
-      <Route path="/client-dashboard" element={<ClientDashboard />} />
-      <Route path="/mother-dashbaord" element={<MotherDashboard />} />
-      <Route path="/signup-client" element={<SignupClient />} />
-      <Route path="/signin-mother" element={ <MotherSignin/>} />
-      <Route path="/signup-mother" element={< MotherSignup/>} />
-      <Route path="/sso-callback-for-mothers" element={< SSOCallbackMother/>} />
+      {/* Wrap all routes inside the Layout */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Role />} />
+        <Route path="/signin-client" element={<ClientSignIn />} />
+        <Route path="/sso-callback" element={<SSOCallback />} />
+        <Route path="/client-dashboard" element={<ClientDashboard />} />
+        <Route path="/mother-dashboard" element={<MotherDashboard />} />
+        <Route path="/signup-client" element={<SignupClient />} />
+        <Route path="/signin-mother" element={<MotherSignin />} />
+        <Route path="/signup-mother" element={<MotherSignup />} />
+        <Route
+          path="/sso-callback-for-mothers"
+          element={<SSOCallbackMother />}
+        />
+      </Route>
     </Routes>
   );
 };

@@ -1,8 +1,9 @@
-import { useClerk } from "@clerk/clerk-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const SSOCallback = () => {
+  const { user } = useUser();
   const { handleRedirectCallback } = useClerk();
   const navigate = useNavigate();
 
@@ -12,12 +13,18 @@ const SSOCallback = () => {
         // Handle the redirect from the OAuth provider
         await handleRedirectCallback();
         // Redirect to home or wherever you want after successful authentication
+        await user.update({
+          unsafeMetadata: {
+            role: "client", // Set user role dynamically
+          },
+        });
+
         navigate("/client-dashboard");
       } catch (err) {
         console.error("Error handling redirect callback:", err);
         // Redirect to sign-in page if there's an error
         navigate("/signin-client");
-        console.log("Error in SSOCALLback...") ;
+        console.log("Error in SSOCALLback...");
       }
     }
 

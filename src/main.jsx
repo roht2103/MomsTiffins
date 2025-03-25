@@ -6,11 +6,7 @@ import App from "./App";
 import "./index.css";
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <ClerkProvider
-    publishableKey={clerkPubKey}
-    afterSignInUrl="/profile-setup"
-    afterSignUpUrl="/profile-setup"
-  >
+  <ClerkProvider publishableKey={clerkPubKey}>
     <BrowserRouter>
       <App />
     </BrowserRouter>
