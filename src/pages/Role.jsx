@@ -1,12 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useUser } from "@clerk/clerk-react";
 const MothersWelcomePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const navigate = useNavigate();
+  const { isLoaded, isSignedIn, user } = useUser();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      const userRole = user.unsafeMetadata;
+      if (userRole.role === "client") {
+        window.location.href = "/client-dashboard";
+      } else if (userRole.role === "mother") {
+        window.location.href = "/mother-dashboard";
+      }
+    }
+  });
 
   return (
     <div className="flex items-center justify-center">
@@ -74,7 +86,7 @@ const MothersWelcomePage = () => {
                 className="bg-white border-2 border-red-400 hover:bg-red-400 hover:text-white transition-all duration-300 rounded-lg p-4 flex items-center gap-4"
                 onClick={() => (window.location.href = "/signin-client")}
               >
-                <span className="text-2xl">🍽️</span>
+                <span className="text-2xl">🍽</span>
                 <span className="font-medium">Login as Customer</span>
               </button>
 

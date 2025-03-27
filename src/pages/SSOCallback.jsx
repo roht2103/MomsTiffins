@@ -13,11 +13,6 @@ const SSOCallback = () => {
         // Handle the redirect from the OAuth provider
         await handleRedirectCallback();
         // Redirect to home or wherever you want after successful authentication
-        await user.update({
-          unsafeMetadata: {
-            role: "client", // Set user role dynamically
-          },
-        });
 
         navigate("/client-dashboard");
       } catch (err) {
