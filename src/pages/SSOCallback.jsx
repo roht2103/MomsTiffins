@@ -14,6 +14,7 @@ const SSOCallback = () => {
         await handleRedirectCallback();
         // Redirect to home or wherever you want after successful authentication
 
+
         navigate("/client-dashboard");
       } catch (err) {
         console.error("Error handling redirect callback:", err);

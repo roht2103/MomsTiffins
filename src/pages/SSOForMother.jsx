@@ -12,6 +12,7 @@ const SSOCallbackMother = () => {
       if (!isSignedIn || !user) return;
 
       try {
+
         await handleRedirectCallback();
 
         navigate("/mother-dashboard");

@@ -258,6 +258,7 @@ const GoogleSignUpButton = () => {
     }
   };
 
+
   return (
     <button
       onClick={signUpWithGoogle}

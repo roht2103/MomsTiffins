@@ -16,6 +16,7 @@ const SignUpMother = () => {
   const navigate = useNavigate();
   const { signOut } = useClerk();
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isLoaded) return;
@@ -73,9 +74,11 @@ const SignUpMother = () => {
         strategy: "oauth_google",
         redirectUrl: "/sso-callback-for-mothers",
         redirectUrlComplete: "/mother-dashboard",
+
         unsafeMetadata: {
           role: "mother",
         },
+
       });
     } catch (err) {
       setError(err.errors?.[0]?.message || "Google sign up failed");
