@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "@clerk/clerk-react"
 const MothersWelcomePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const navigate = useNavigate();
+  const { isLoaded, isSignedIn } = useAuth() ;
+
+
+  // useEffect(()=>{
+  //   if(isLoaded  && isSignedIn) {
+  //     window.location.href= "/client-dashboard" ;
+  //   }
+
+  // })
 
   return (
     <div className="flex items-center justify-center">

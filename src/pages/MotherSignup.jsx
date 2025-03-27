@@ -1,4 +1,4 @@
-import { useSignUp, useClerk } from "@clerk/clerk-react";
+import { useSignUp, useClerk, useSession } from "@clerk/clerk-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,7 @@ const SignUpMother = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const navigate = useNavigate();
   const { signOut } = useClerk() ;
+  
 
 
   const handleSubmit = async (e) => {
@@ -75,6 +76,9 @@ const SignUpMother = () => {
         strategy: "oauth_google",
         redirectUrl: "/sso-callback-for-mothers",
         redirectUrlComplete: "/mother-dashboard",
+        unsafeMetadata : {
+          role : "mother"
+        }
       });
     } catch (err) {
       setError(err.errors?.[0]?.message || "Google sign up failed");

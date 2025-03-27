@@ -11,14 +11,9 @@ const SSOCallbackMother = () => {
       if (!isSignedIn || !user) return;
 
       try {
-        // Set metadata for the new user
-        await user.update({
-          unsafeMetadata: {
-            role: "mother", // Set user role dynamically
-          },
-        });
 
-        // Redirect to dashboard after updating metadata
+        await handleRedirectCallback();
+
         navigate("/mother-dashboard");
       } catch (error) {
         console.error("Error updating metadata:", error);

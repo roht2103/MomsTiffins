@@ -219,7 +219,10 @@ const GoogleSignUpButton = () => {
             await signUp.authenticateWithRedirect({
                 strategy: "oauth_google",
                 redirectUrl: "/sso-callback",
-                redirectUrlComplete: "/",
+                redirectUrlComplete: "/client-dashboard",
+                unsafeMetadata : {
+                    role :  "client" 
+                }
             });
         } catch (err) {
             console.error("Error:", err);

@@ -157,7 +157,7 @@ const GoogleSignInButton = () => {
       await signIn.authenticateWithRedirect({
         strategy: "oauth_google",
         redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/",
+        redirectUrlComplete: "/client-dashboard",
       });
     } catch (err) {
       console.error("Error:", err);
