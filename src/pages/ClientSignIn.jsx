@@ -24,10 +24,30 @@ const ClientSignIn = () => {
 
       console.log("Sign-in result:", result);
 
+      // Fetch user data from MongoDB first
+      const response = await fetch("http://localhost:5000/api/user-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const userData = await response.json();
+
+      if (!response.ok || !userData) {
+        setError("User not found. Please check your email or sign up.");
+        return;
+      }
+
       if (result.status === "complete" && result.createdSessionId) {
         await setActive({ session: result.createdSessionId });
         console.log("Session set, navigating...");
-        navigate("/client-dashboard", { replace: true });
+        if (!userData.profileComplete) {
+          navigate("/profile-setup", { replace: true });
+        } else {
+          navigate("/client-dashboard", { replace: true });
+        }
       } else {
         setError("Login failed. Please check your credentials.");
       }

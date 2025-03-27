@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 
 const SSOCallbackMother = () => {
   const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
+  const { handleRedirectCallback } = useClerk();
 
   useEffect(() => {
     const updateMetadata = async () => {

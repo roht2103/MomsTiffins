@@ -14,8 +14,7 @@ const SignUpMother = () => {
   const [pendingVerification, setPendingVerification] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const navigate = useNavigate();
-  const { signOut } = useClerk() ;
-  
+  const { signOut } = useClerk();
 
 
   const handleSubmit = async (e) => {
@@ -25,15 +24,14 @@ const SignUpMother = () => {
     setError("");
 
     try {
-    
-      await signOut() ;
+      await signOut();
 
       const result = await signUp.create({
         emailAddress: email,
         password,
         firstName,
         lastName,
-        unsafeMetadata : { role: "mother" }
+        unsafeMetadata: { role: "mother" },
       });
 
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
@@ -76,9 +74,11 @@ const SignUpMother = () => {
         strategy: "oauth_google",
         redirectUrl: "/sso-callback-for-mothers",
         redirectUrlComplete: "/mother-dashboard",
-        unsafeMetadata : {
-          role : "mother"
-        }
+
+        unsafeMetadata: {
+          role: "mother",
+        },
+
       });
     } catch (err) {
       setError(err.errors?.[0]?.message || "Google sign up failed");
@@ -92,7 +92,9 @@ const SignUpMother = () => {
         {!pendingVerification ? (
           <>
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-rose-600">Mother's Tiffin</h1>
+              <h1 className="text-3xl font-bold text-rose-600">
+                Mother's Tiffin
+              </h1>
               <h2 className="text-2xl font-semibold text-gray-800 mt-4">
                 Mother Account Registration
               </h2>
@@ -205,7 +207,7 @@ const SignUpMother = () => {
             </form>
           </>
         ) : (
-          <EmailVerificationView 
+          <EmailVerificationView
             email={email}
             verificationCode={verificationCode}
             setVerificationCode={setVerificationCode}
@@ -227,15 +229,20 @@ const SignUpMother = () => {
 };
 
 // Separate component for verification view
-const EmailVerificationView = ({ email, verificationCode, setVerificationCode, handleVerify, loading, error }) => (
+const EmailVerificationView = ({
+  email,
+  verificationCode,
+  setVerificationCode,
+  handleVerify,
+  loading,
+  error,
+}) => (
   <div className="text-center">
     <h2 className="text-2xl font-semibold text-gray-800">Verify Your Email</h2>
     <p className="text-gray-600 mt-2">Enter the code sent to {email}</p>
-    
+
     {error && (
-      <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
-        {error}
-      </div>
+      <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">{error}</div>
     )}
 
     <input

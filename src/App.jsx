@@ -61,6 +61,7 @@ const App = () => {
         <Route path="/signup-client" element={<SignupClient />} />
         <Route path="/signin-mother" element={<MotherSignin />} />
         <Route path="/signup-mother" element={<MotherSignup />} />
+        <Route path="/profile-setup" element={<ProfileSetup />} />
         <Route
           path="/sso-callback-for-mothers"
           element={<SSOCallbackMother />}
