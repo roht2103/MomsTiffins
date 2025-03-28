@@ -30,7 +30,7 @@ const SignupClient = () => {
         password,
         firstName,
         lastName,
-        publicMetadata: {
+        unsafeMetadata: {
           role: "client",
         },
       });
