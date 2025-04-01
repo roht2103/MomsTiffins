@@ -10,7 +10,7 @@ export const handleCreateNewClient = async (req, res) =>{
     try {
         const { clerkUserId, email,  profileComplete } = req.body;
         // Check if user already exists
-        let user = await client.findOne({ clerkUserId });
+        let user = await client.findOne({ email });
         if (user) {
             return res.json({message : "User alredy exists", user}).status(204);     
         }
@@ -24,6 +24,7 @@ export const handleCreateNewClient = async (req, res) =>{
         console.log("user saved") 
         res.status(200).json({ message: "User saved successfully", newUser });
       } catch (error) {
+          console.log(error)
         res.status(500).json({ error: "Internal Server Error" , err : error});
       }
 } 
