@@ -17,49 +17,42 @@ const MontherSignin = () => {
     setError("");
 
     try {
-      // 1. Initiate sign-in process
-
-      await signOut();
       const signInAttempt = await signIn.create({
         identifier: email,
         password,
       });
 
-      // 2. Prepare first factor (password in our case)
       if (signInAttempt.status === "needs_first_factor") {
-        await signIn.prepareFirstFactor({
-          strategy: "password", // Using password strategy
-        });
-
-        // 3. Attempt first factor verification
         const verification = await signIn.attemptFirstFactor({
           strategy: "password",
           password,
         });
 
         if (verification.status === "complete") {
-          // 6. Set active session if verification is complete
           await setActive({ session: verification.createdSessionId });
-
-          // Verify role before proceeding
-          if (verification.user?.publicMetadata?.role !== "mother") {
-            throw new Error("This portal is for mothers only");
-          }
-          console.log("Is it redirects");
-          // navigate("/mother-dashboard");
         } else {
           throw new Error("Authentication incomplete");
         }
       } else if (signInAttempt.status === "complete") {
-        // Handle immediate completion (if no verification needed)
         await setActive({ session: signInAttempt.createdSessionId });
+        const response = await fetch("http://localhost:5000/api/user-profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, role: "mother" }),
+        });
 
-        // Verify role
-        if (signInAttempt.user?.publicMetadata?.role !== "mother") {
-          throw new Error("This portal is for mothers only");
+        const userData = await response.json();
+
+        if (!response.ok || !userData) {
+          setError("User not found. Please check your email or sign up.");
+          return;
         }
 
-        navigate("/mother-dashboard");
+        if (!userData.profileComplete) {
+          navigate("/profile-setup", { replace: true });
+        } else {
+          navigate("/mother-dashboard", { replace: true });
+        }
       } else {
         throw new Error("Unexpected authentication status");
       }
@@ -86,7 +79,7 @@ const MontherSignin = () => {
         await signIn.authenticateWithRedirect({
           strategy: "oauth_google",
           redirectUrl: "/sso-callback-for-mothers",
-          redirectUrlComplete: "/mother-dashboard",
+          redirectUrlComplete: "/profile-setup",
         });
       } catch (err) {
         console.error("Error:", err);
