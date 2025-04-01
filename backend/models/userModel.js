@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
       type: String, 
       default: "", 
     },
-    foodPreferences: { 
+    subscribedMother: { 
       type: String, 
       default: "", 
     },
@@ -32,17 +32,18 @@ const userSchema = new mongoose.Schema(
       type: { 
         type: String, 
         enum: ["Point"], 
-        default: "Point", 
+        default: "Point",
       },
       coordinates: { 
-        type: [Number], // [longitude, latitude] 
-        required: true, 
-      }, 
+        type: [Number], // [longitude, latitude]
+        default: [-1,-1], // Allow it to be empty initially
+      },
     },
   },
   { timestamps: true }
 );
 
 userSchema.index({ location: "2dsphere" }); // Geospatial index
+const client = mongoose.model("client", userSchema, "client"); 
 
-export default mongoose.model("User", userSchema, "User");
+export default client;
