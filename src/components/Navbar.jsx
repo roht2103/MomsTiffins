@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import React from "react";
 import { Button } from "./ui/button";
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
+  const { user } = useUser();
   return (
     <nav className="p-4 shadow-md bg-white sticky top-0 z-50 w-full">
       <div className="container mx-auto flex justify-between items-center">
@@ -72,7 +73,8 @@ const Navbar = () => {
           </div>
 
           {/* User Avatar on Right */}
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center space-x-4">
+            <p>{user?.fullName || "User"}</p>
             <UserButton
               appearance={{
                 elements: {

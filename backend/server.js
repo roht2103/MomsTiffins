@@ -23,6 +23,8 @@ mongoose
 const clientSchema = new mongoose.Schema({
   clerkUserId: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
   location: { type: String },
   mobileNumber: { type: String },
   foodPreferences: { type: Array },
@@ -30,42 +32,81 @@ const clientSchema = new mongoose.Schema({
   profileComplete: { type: Boolean, default: false },
 });
 
-// Create Client Model
-const Client = mongoose.model("Client", clientSchema, "clients");
+// Define Mother Schema
+const motherSchema = new mongoose.Schema({
+  clerkUserId: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  location: { type: String },
+  mobileNumber: { type: String },
+  specialty: { type: String }, // Specialty in food
+  rating: { type: Number, default: 0 },
+  reviews: { type: Number, default: 0 },
+  role: { type: String, required: true },
+  profileComplete: { type: Boolean, default: false },
+});
 
-// Route to store new clients in the `clients` collection
+// Create Models
+const Client = mongoose.model("Client", clientSchema, "clients");
+const Mother = mongoose.model("Mother", motherSchema, "mothers");
+
+// Route to handle user signup based on role
 app.post("/api/signup", async (req, res) => {
   try {
-    const {
-      clerkUserId,
-      email,
-      location,
-      mobileNumber,
-      foodPreferences,
-      role,
-    } = req.body;
+    const { clerkUserId, email, firstName, lastName, role } = req.body;
 
-    // Check if client already exists
-    let client = await Client.findOne({ clerkUserId });
-    if (client) {
-      return res.status(400).json({ message: "Client already exists" });
+    // Validate role
+    if (!["client", "mother"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
     }
 
-    // Create new client
-    client = new Client({
-      clerkUserId,
-      email,
-      location,
-      mobileNumber,
-      foodPreferences,
-      role,
-      profileComplete: false,
-    });
+    if (role === "client") {
+      // Check if client already exists
+      let existingClient = await Client.findOne({ clerkUserId });
+      if (existingClient) {
+        return res.status(400).json({ message: "Client already exists" });
+      }
 
-    await client.save();
+      // Create new client
+      const client = new Client({
+        clerkUserId,
+        email,
+        firstName,
+        lastName,
+        role,
+        profileComplete: false,
+      });
 
-    res.status(201).json({ message: "Client registered successfully", client });
-    console.log("Client registered successfully");
+      await client.save();
+      console.log("Client registered successfully");
+      return res
+        .status(201)
+        .json({ message: "Client registered successfully", client });
+    } else if (role === "mother") {
+      console.log("Mother role detected");
+      // Check if mother already exists
+      let existingMother = await Mother.findOne({ clerkUserId });
+      if (existingMother) {
+        return res.status(400).json({ message: "Mother already exists" });
+      }
+
+      // Create new mother
+      const mother = new Mother({
+        clerkUserId,
+        email,
+        firstName,
+        lastName,
+        role,
+        profileComplete: false,
+      });
+
+      await mother.save();
+      console.log("Mother registered successfully");
+      return res
+        .status(201)
+        .json({ message: "Mother registered successfully", mother });
+    }
   } catch (error) {
     console.error("Signup Error:", error);
     res.status(500).json({ message: "Server error" });
@@ -81,34 +122,39 @@ app.post("/api/profile-setup", async (req, res) => {
       location,
       mobileNumber,
       foodPreferences,
+      speciality,
       role,
     } = req.body;
+    let user;
+    if (role === "client") {
+      console.log("Client role detected");
+      user = await Client.findOne({ $or: [{ clerkUserId }, { email }] });
+    } else {
+      console.log("Mother role detected");
+      user = await Mother.findOne({ $or: [{ clerkUserId }, { email }] });
+    }
 
-    // Find client by Clerk user ID or email
-    let client = await Client.findOne({ $or: [{ clerkUserId }, { email }] });
-
-    if (!client) {
+    if (!user) {
       return res.status(404).json({ message: "Client not found" });
     }
 
-    // Update client details
-    client.location = location;
-    client.mobileNumber = mobileNumber;
-    client.foodPreferences = foodPreferences;
-    client.role = role;
-    client.profileComplete = true;
+    user.location = location;
+    user.mobileNumber = mobileNumber;
+    role === "client"
+      ? (user.foodPreferences = foodPreferences)
+      : (user.speciality = speciality);
+    user.profileComplete = true;
 
-    // Save the updated client
-    await client.save();
+    await user.save();
 
-    res.status(200).json({ message: "Profile updated successfully", client });
+    res.status(200).json({ message: "Profile updated successfully", user });
   } catch (error) {
     console.error("Profile Setup Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-app.use(express.json()); // Ensure JSON body parsing middleware is used
+app.use(express.json());
 
 app.post("/api/get-user", async (req, res) => {
   const { email } = req.body;
@@ -118,11 +164,22 @@ app.post("/api/get-user", async (req, res) => {
   }
 
   try {
-    const client = await Client.findOne({ email }).select("-password"); // Exclude password field if present
-    if (!client) {
-      return res.status(404).json({ message: "Client not found" });
+    let user = await Client.findOne({ email }).select("-password");
+
+    if (user) {
+      console.log("User found in Client model:", user);
+      return res.json({ ...user.toObject(), role: "client" });
     }
-    res.json(client);
+
+    user = await Mother.findOne({ email }).select("-password");
+
+    if (user) {
+      console.log("User found in Mother model:", user);
+      return res.json({ ...user.toObject(), role: "mother" });
+    }
+
+    console.log("User not found");
+    return res.status(404).json({ message: "User not found" });
   } catch (error) {
     console.error("Get User Error:", error);
     res.status(500).json({ message: "Server error" });
@@ -131,14 +188,19 @@ app.post("/api/get-user", async (req, res) => {
 
 // Route to fetch client profile completion status
 app.post("/api/user-profile", async (req, res) => {
-  const { email } = req.body;
+  const { email, role } = req.body;
   try {
-    const client = await Client.findOne({ email });
-    if (!client) {
-      console.log("Client not found");
+    let user;
+    if (role === "client") {
+      user = await Client.findOne({ email });
+    } else {
+      user = await Mother.findOne({ email });
+    }
+    if (!user) {
+      console.log("user not found: ", email);
       return res.status(404).json({ message: "Client not found" });
     }
-    res.json({ profileComplete: client.profileComplete });
+    res.json({ profileComplete: user.profileComplete });
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.log(error);

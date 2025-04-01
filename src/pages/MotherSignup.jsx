@@ -1,7 +1,7 @@
 import { useSignUp, useClerk, useSession } from "@clerk/clerk-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 const SignUpMother = () => {
   const { isLoaded, signUp } = useSignUp();
   const { setActive } = useClerk();
@@ -46,6 +46,7 @@ const SignUpMother = () => {
   const handleVerify = async () => {
     if (!isLoaded) return;
     setLoading(true);
+    setError("");
 
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
@@ -54,7 +55,19 @@ const SignUpMother = () => {
 
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        navigate("/mother-dashboard");
+
+        await axios.post("http://localhost:5000/api/signup", {
+          clerkUserId: completeSignUp.createdUserId,
+          email,
+          firstName,
+          lastName,
+          role: "mother",
+          profileComplete: false,
+        });
+
+        navigate("/profile-setup");
+      } else {
+        setError("Verification process incomplete.");
       }
     } catch (err) {
       setError(err.errors?.[0]?.message || "Verification failed");
@@ -72,10 +85,23 @@ const SignUpMother = () => {
       await signUp.authenticateWithRedirect({
         strategy: "oauth_google",
         redirectUrl: "/sso-callback-for-mothers",
-        redirectUrlComplete: "/mother-dashboard",
+        redirectUrlComplete: "/profile-setup",
         unsafeMetadata: {
           role: "mother",
         },
+      });
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code: verificationCode,
+      });
+      console.log(verificationCode);
+
+      await axios.post("http://localhost:5000/api/signup", {
+        clerkUserId: completeSignUp.createdUserId,
+        email,
+        firstName,
+        lastName,
+        role: "mother",
+        profileComplete: false,
       });
     } catch (err) {
       setError(err.errors?.[0]?.message || "Google sign up failed");
@@ -84,7 +110,7 @@ const SignUpMother = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-md overflow-hidden p-8">
         {!pendingVerification ? (
           <>
