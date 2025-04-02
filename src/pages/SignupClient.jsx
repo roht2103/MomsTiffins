@@ -59,18 +59,7 @@ const SignupClient = () => {
         code: verificationCode,
       });
 
-      if (completeSignUp.status === "complete") {
-        await setActive({ session: completeSignUp.createdSessionId });
-        await axios.post("http://localhost:5000/api/signup", {
-          clerkUserId: completeSignUp.createdUserId,
-          email,
-          firstName,
-          lastName,
-          role: "client",
-          profileComplete: false,
-        });
-        navigate("/profile-setup");
-      }
+
     } catch (err) {
       console.error("Verification error:", err);
       setError(err.errors[0].longMessage || err.errors[0].message);
@@ -252,6 +241,7 @@ const GoogleSignUpButton = () => {
           role: "client",
         },
       });
+
     } catch (err) {
       console.error("Error:", err);
       setLoading(false);

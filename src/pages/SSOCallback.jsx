@@ -13,7 +13,7 @@ const SSOCallback = () => {
         // Handle the redirect from the OAuth provider
         await handleRedirectCallback();
         // Redirect to home or wherever you want after successful authentication
-
+        
 
         navigate("/client-dashboard");
       } catch (err) {

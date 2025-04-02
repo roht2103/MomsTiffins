@@ -16,6 +16,7 @@ import SignupClient from "./pages/SignupClient";
 import MotherSignin from "./pages/MotherSignin";
 import MotherSignup from "./pages/MotherSignup";
 import SSOCallbackMother from "./pages/SSOForMother";
+import KitchenMenu from "./pages/KitchenMenu"
 
 const Layout = () => (
   <div>
@@ -62,6 +63,7 @@ const App = () => {
         <Route path="/signin-mother" element={<MotherSignin />} />
         <Route path="/signup-mother" element={<MotherSignup />} />
         <Route path="/profile-setup" element={<ProfileSetup />} />
+        <Route path="/menu/:id" element={<KitchenMenu/>}></Route>
         <Route
           path="/sso-callback-for-mothers"
           element={<SSOCallbackMother />}
