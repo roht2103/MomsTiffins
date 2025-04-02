@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ const ProfileSetup = () => {
   const navigate = useNavigate();
 
   const [role, setRole] = useState(null);
+  const [kitchenName, setKitchenName] = useState("");
   const [location, setLocation] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [foodPreferences, setFoodPreferences] = useState("");
@@ -66,7 +68,9 @@ const ProfileSetup = () => {
         email: user.primaryEmailAddress.emailAddress,
         location,
         mobileNumber,
-        ...(role === "client" ? { foodPreferences } : { speciality }),
+        foodPreferences,
+        speciality,
+        kitchenName,
         role,
       };
 
@@ -115,6 +119,20 @@ const ProfileSetup = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {role === "mother" && (
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Kitchen Name
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Your kitchen name"
+                  value={kitchenName}
+                  onChange={(e) => setKitchenName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium mb-2">
                 Your Location
@@ -156,7 +174,7 @@ const ProfileSetup = () => {
             ) : (
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Speciality
+                  speciality
                 </label>
                 <Input
                   type="text"
