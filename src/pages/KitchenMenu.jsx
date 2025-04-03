@@ -1,301 +1,279 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 import { 
-  FaUtensils, 
-  FaArrowLeft, 
   FaStar, 
-  FaBreadSlice, 
-  FaGlassCheers,
-  FaPlus,
-  FaShoppingBasket,
-  FaCircle,
-  FaLeaf,
+  FaPhone, 
+  FaMapMarkerAlt, 
+  FaShoppingCart,
   FaHeart,
+  FaUtensils,
+  FaSun,
+  FaMoon,
   FaClock
 } from "react-icons/fa";
+import { GiMeal } from "react-icons/gi";
+import { useCart } from "../context/CartContext";
+import { useUser } from "@clerk/clerk-react";
 
-const KitchenMenu = () => {
-  // Kitchen information
-  const kitchenInfo = {
-    name: "Marathi Zaika",
-    cuisine: "Authentic Maharashtrian Cuisine",
-    rating: 4.8,
-    reviewCount: 247,
-    heroImage: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-  };
 
-  // Festival special banner
-  const festivalSpecial = {
-    title: "Gudi Padwa Special",
-    subtitle: "Celebrate the Maharashtrian New Year with traditional flavors",
-    description: "Our special Gudi Padwa menu features traditional sweets and savories prepared with authentic recipes passed down through generations. The star of our festival menu is the delicious Puran Poli - a sweet flatbread stuffed with a mixture of chana dal, jaggery, and cardamom.",
-    image: "https://cdn.prod.website-files.com/64931d2aee18510b47f4bb1f/66c8b8f253827b985e6d1a48_Puran-Poli-Ganesh-Chaturthi-Recipe-Cover-Image.jpg"
-  };
-
-  // Menu categories with items
-  const menuCategories = [
-    {
-      id: 1,
-      name: "Gudi Padwa Special Menu",
-      icon: <FaBreadSlice />,
-      items: [
-        {
-          id: 101,
-          name: "Puran Poli",
-          price: "₹80",
-          description: "Sweet flatbread stuffed with chana dal, jaggery and cardamom - the quintessential Gudi Padwa delicacy",
-          rating: 4.9,
-          image: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fmadhurasrecipe.com%2Fholi-special-traditional-puranpoli%2F&psig=AOvVaw39HCcPh9eHNlI9Mn_lkH_b&ust=1743651705007000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMCzn_e2uIwDFQAAAAAdAAAAABAh",
-          isVeg: true,
-          isPopular: true,
-          prepTime: "20 min"
-        },
-        {
-          id: 102,
-          name: "Shrikhand",
-          price: "₹90",
-          description: "Creamy strained yogurt flavored with saffron, cardamom and nuts - a festive favorite",
-          rating: 4.7,
-          image: "https://samosastreet.com/wp-content/uploads/Kesar-Shrikhand-2.jpg",
-          isVeg: true,
-          isPopular: false,
-          prepTime: "15 min"
-        },
-        {
-          id: 103,
-          name: "Matki Usal",
-          price: "₹110",
-          description: "Sprouted moth beans curry with traditional Maharashtrian spices, served with pav",
-          rating: 4.6,
-          image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzA_sNEnODojmMKrFAA_LG3g2oD3m80dzbPA&s",
-          isVeg: true,
-          isPopular: false,
-          prepTime: "25 min"
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: "Maharashtrian Main Course",
-      icon: <FaUtensils />,
-      items: [
-        {
-          id: 201,
-          name: "Pithla Bhakri",
-          price: "₹120",
-          description: "Chickpea flour curry served with traditional jowar (sorghum) flatbread",
-          rating: 4.8,
-          image: "https://nanchi.blog/wp-content/uploads/2020/03/pithla-bhakri-thali-sinhagad-fort-pune.jpg?w=1024",
-          isVeg: true,
-          isPopular: true,
-          prepTime: "20 min"
-        },
-        {
-          id: 202,
-          name: "Misal Pav",
-          price: "₹130",
-          description: "Spicy sprouted beans curry topped with farsan, onions and served with pav",
-          rating: 4.9,
-          image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQTJ_MJKzQW_0JD367Q36UEtSo-YdmcVZ_gg&s",
-          isVeg: true,
-          isPopular: true,
-          prepTime: "30 min"
-        },
-        {
-          id: 203,
-          name: "Bharli Vangi",
-          price: "₹150",
-          description: "Baby eggplants stuffed with coconut-peanut masala in a spicy gravy",
-          rating: 4.7,
-          image: "https://i0.wp.com/kalimirchbysmita.com/wp-content/uploads/2018/12/Bharli-Vangi-01.jpg?resize=1537%2C1024",
-          isVeg: true,
-          isPopular: false,
-          prepTime: "35 min"
-        },
-        {
-          id: 204,
-          name: "Kombdi Vade",
-          price: "₹180",
-          description: "Malvani style chicken curry served with deep-fried bread (vade)",
-          rating: 4.8,
-          image: "https://www.whiskaffair.com/wp-content/uploads/2020/04/Kombdi-Vade-2-3.jpg",
-          isVeg: false,
-          isPopular: true,
-          prepTime: "40 min"
-        }
-      ]
-    },
-    {
-      id: 3,
-      name: "Beverages & Desserts",
-      icon: <FaGlassCheers />,
-      items: [
-        {
-          id: 301,
-          name: "Sol Kadhi",
-          price: "₹60",
-          description: "Refreshing kokum and coconut milk drink - perfect digestive after spicy meals",
-          rating: 4.5,
-          image: "https://www.archanaskitchen.com/images/archanaskitchen/1-Author/shaheen_ali/Solkadhi_Recipe_Kokum_And_Coconut_Milk_Drink.jpg",
-          isVeg: true,
-          isPopular: false,
-          prepTime: "10 min"
-        },
-        {
-          id: 302,
-          name: "Ukadiche Modak",
-          price: "₹100 (3 pcs)",
-          description: "Steamed rice flour dumplings stuffed with coconut and jaggery - Ganesh Chaturthi special",
-          rating: 4.9,
-          image: "https://www.awesomecuisine.com/wp-content/uploads/2018/05/Modak.jpg",
-          isVeg: true,
-          isPopular: true,
-          prepTime: "45 min"
-        }
-      ]
-    }
-  ];
-
-  return (
-    <div className="bg-orange-50 min-h-screen font-sans">
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-        {/* Back Button */}
-        <button className="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-3 rounded-lg font-medium flex items-center gap-2 hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md mb-6">
-          <FaArrowLeft />
-          <span>Back to Kitchens</span>
-        </button>
-        
-        {/* Kitchen Hero Section */}
-        <section className="relative h-72 md:h-80 rounded-3xl overflow-hidden mb-8 flex items-center justify-center shadow-lg">
-      <div 
-        className="absolute inset-0  bg-opacity-50 bg-cover bg-center"
-        style={{ backgroundImage: `url(${kitchenInfo.heroImage})` ,  backdropfilter: `blur(10px) `, backgroundBlendMode :`multiply`}}
-      ></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-      <div className="relative z-10 text-center text-white px-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold  mb-2 drop-shadow-xl">{kitchenInfo.name}</h1>
-        <p className="text-lg md:text-xl opacity-90 mb-4 font-light">{kitchenInfo.cuisine}</p>
-        <div className="inline-flex items-center gap-2  bg-opacity-30 backdrop-blur-md px-6 py-2 rounded-full shadow-lg text-white">
-          <FaStar className="text-yellow-400 text-lg" />
-          <span className="text-lg font-semibold">{kitchenInfo.rating}</span>
-          <span className="text-sm opacity-80">({kitchenInfo.reviewCount} reviews)</span>
+const MenuPage = () => {
+  const location = useLocation();
+  const kitchen = location.state?.kitchen;
+  const { cart, addToCart } = useCart();
+  const [subscribe, setSubscribe] = useState("Subscribe to Kitchen")
+  
+  const { user } = useUser() ;
+  
+  if (!kitchen) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center p-8 bg-white rounded-xl shadow-md">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Kitchen Not Found</h2>
+          <p className="text-gray-600">The kitchen you're looking for doesn't exist or may have been removed.</p>
         </div>
       </div>
-    </section>
+    );
+  }
 
-        {/* Festival Special Banner */}
-        <section className="mb-16">
-          <div className="bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl p-8 shadow-lg border border-orange-200">
-            <div className="flex flex-col md:flex-row gap-8 items-center">
-              <img 
-                src={festivalSpecial.image} 
-                alt={festivalSpecial.title}
-                className="w-full md:w-56 h-56 object-cover rounded-2xl border-2 border-orange-400 shadow-md transform rotate-2 hover:rotate-0 transition-all duration-300"
-              />
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-1 rounded-full text-sm font-medium mb-3">
-                  <span>🎉</span>
-                  <span>Limited Time Offer</span>
+  // Icons for different meal types
+  const mealIcons = {
+    breakfast: <FaSun className="text-yellow-400" />,
+    lunch: <GiMeal className="text-red-400" />,
+    dinner: <FaMoon className="text-indigo-400" />
+  };
+
+  const handleAddToCart = (item) => {
+    if (cart.kitchenId && cart.kitchenId !== kitchen._id) {
+      if (window.confirm(
+        `Your cart contains items from ${cart.kitchenName}. 
+        Adding this item will clear your current cart. Continue?`
+      )) {
+        addToCart(item, kitchen);
+      }
+    } else {
+      addToCart(item, kitchen);
+    }
+  };
+
+  const updateSubscription =async (e)=>{
+
+    const response = await axios.put("http://localhost:5000/api/updatesubscription", {
+      kitchenName : kitchen.kitchenName ,
+      kitchenEmail :  kitchen.email ,
+      clientEmail : user.primaryEmailAddress.emailAddress 
+    })
+    console.log(response)
+    if(response.data.success){
+      setSubscribe("Subscribed");
+
+    }
+
+  }
+
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      {/* Modern Hero Section */}
+      <div className="relative h-96 overflow-hidden">
+        <img
+          src={kitchen.logoURL}
+          alt={kitchen.kitchenName}
+          className="w-full h-full object-cover object-center filter brightness-90"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+        <div className="absolute bottom-0 left-0 right-0 p-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                <FaStar className="text-yellow-300" />
+                {kitchen.rating}
+              </span>
+              <span className="bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                {Math.round(kitchen.distance)}m away
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
+              {kitchen.kitchenName}
+            </h1>
+            <p className="text-xl text-gray-200 mb-4 flex items-center gap-2">
+              <FaUtensils className="text-red-300" />
+              {kitchen.speciality}
+            </p>
+            <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-all shadow-lg hover:shadow-xl"
+              onClick={(e)=> updateSubscription(e)}
+            >
+              <FaHeart />
+              {subscribe}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Kitchen Info Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8 border-l-4 border-red-600">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">About {kitchen.firstName}'s Kitchen</h2>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 text-gray-700">
+                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+                    <FaStar />
+                  </div>
+                  <span>{kitchen.rating} rating ({kitchen.reviews} reviews)</span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-red-700 mb-2">{festivalSpecial.title}</h3>
-                <p className="text-orange-800 text-lg mb-4 font-medium">{festivalSpecial.subtitle}</p>
-                <p className="text-gray-700 mb-6 leading-relaxed">{festivalSpecial.description}</p>
-                <button className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-3 hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md">
-                  <FaShoppingBasket />
-                  <span>Order Festival Specials</span>
-                </button>
+                <div className="flex items-center gap-3 text-gray-700">
+                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+                    <FaMapMarkerAlt />
+                  </div>
+                  <span>{Math.round(kitchen.distance)}m from your location</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-700">
+                  <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+                    <FaPhone />
+                  </div>
+                  <span>{kitchen.mobileNumber}</span>
+                </div>
               </div>
             </div>
+            <div className="flex flex-col gap-3">
+              <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors shadow-md">
+                <FaShoppingCart />
+                View Subscription Plans
+              </button>
+              <button className="border border-red-600 text-red-600 hover:bg-red-50 px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
+                <FaClock />
+                Check Delivery Time
+              </button>
+            </div>
           </div>
-        </section>
+        </div>
 
-        {/* Menu Categories */}
-        <div className="space-y-16">
-          {menuCategories.map(category => (
-            <section key={category.id}>
-              <h2 className="text-2xl md:text-3xl font-bold text-red-700 mb-8 flex items-center gap-4 relative pb-3">
-                <span className="text-orange-500 text-3xl">{category.icon}</span>
-                <span>{category.name}</span>
-                <span className="absolute bottom-0 left-0 w-24 h-1 bg-orange-400 rounded-full"></span>
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {category.items.map(item => (
-                  <div key={item.id} className="bg-white rounded-2xl shadow-md overflow-hidden transition-all hover:shadow-xl hover:-translate-y-2 duration-300 group">
-                    <div className="relative">
-                      <img 
-                        src={item.image} 
-                        alt={item.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-0 right-0 m-3">
-                        {item.isPopular && (
-                          <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent h-16 opacity-60"></div>
-                    </div>
-                    
-                    <div className="p-5">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            {item.isVeg ? (
-                              <span className="flex items-center text-green-600 text-xs font-medium">
-                                <FaLeaf className="text-xs mr-1" />
-                                Pure Veg
-                              </span>
-                            ) : (
-                              <span className="flex items-center text-red-600 text-xs font-medium">
-                                <FaCircle className="text-xs mr-1" />
-                                Non-Veg
-                              </span>
-                            )}
-                            <span className="flex items-center text-amber-600 text-xs font-medium">
-                              <FaClock className="text-xs mr-1" />
-                              {item.prepTime}
-                            </span>
-                          </div>
-                          <h3 className="font-bold text-gray-800 text-lg">{item.name}</h3>
-                        </div>
-                        <span className="font-bold text-red-600 text-xl">{item.price}</span>
-                      </div>
-                      
-                      <p className="text-gray-600 text-sm mb-5 leading-relaxed">{item.description}</p>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1 text-amber-500 font-medium">
-                          <FaStar className="fill-current" />
-                          {item.rating}
-                        </span>
-                        <div className="flex gap-2">
-                          <button className="bg-red-100 text-red-600 p-2 rounded-full hover:bg-red-200 transition-colors">
-                            <FaHeart />
-                          </button>
-                          <button className="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:from-red-700 hover:to-red-800 transition-all shadow-sm">
-                            <FaPlus />
-                            <span>Add to Cart</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+        {/* Today's Special Section */}
+        {kitchen.todaysMenu && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                <FaStar size={14} />
               </div>
-            </section>
+              <h2 className="text-2xl font-bold text-gray-800">Today's Special</h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {Object.entries(kitchen.todaysMenu).map(([mealType, items]) => (
+                <div key={mealType} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:border-red-100 transition-all">
+                  <div className="p-5 bg-gradient-to-r from-red-50 to-white">
+                    <h3 className="font-semibold text-lg text-red-700 capitalize flex items-center gap-2">
+                      {mealIcons[mealType] || <FaUtensils />}
+                      {mealType} Specials
+                    </h3>
+                  </div>
+                  <div className="p-5">
+                    {items.map((item, index) => (
+                      <div key={index} className="mb-6 last:mb-0 group">
+                        <div className="flex gap-4">
+                          {item.imageURL && (
+                            <div className="flex-shrink-0">
+                              <img
+                                src={item.imageURL}
+                                alt={item.name}
+                                className="w-20 h-20 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                              />
+                            </div>
+                          )}
+                          <div className="flex-grow">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors">{item.name}</h4>
+                                <p className="text-gray-600 text-sm mt-1">{item.description}</p>
+                              </div>
+                              <span className="font-bold text-red-600">₹{item.price}</span>
+                            </div>
+                            <div className="flex items-center justify-between mt-3">
+                              <div className="flex items-center gap-1 text-yellow-400">
+                                <FaStar size={14} />
+                                <span className="text-gray-700 text-sm">{item.rating}</span>
+                              </div>
+                              <button 
+                                onClick={() => handleAddToCart(item)}
+                                className="text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full transition-colors shadow-sm flex items-center gap-1"
+                              >
+                                <FaShoppingCart size={12} />
+                                Add to Cart
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Full Menu Sections */}
+        <div className="space-y-12">
+          {['breakfast', 'lunch', 'dinner'].map((mealType) => (
+            kitchen.menu[mealType] && kitchen.menu[mealType].length > 0 && (
+              <div key={mealType} className="bg-white rounded-xl shadow-md overflow-hidden">
+                <div className="p-5 bg-gradient-to-r from-red-50 to-white border-b border-gray-100">
+                  <h2 className="text-2xl font-bold text-gray-800 capitalize flex items-center gap-3">
+                    {mealIcons[mealType] || <FaUtensils />}
+                    {mealType} Menu
+                  </h2>
+                </div>
+                <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {kitchen.menu[mealType].map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="border rounded-lg p-4 hover:shadow-lg transition-all hover:border-red-100 group"
+                    >
+                      <div className="relative mb-3 overflow-hidden rounded-lg">
+                        {item.imageURL ? (
+                          <img
+                            src={item.imageURL}
+                            alt={item.name}
+                            className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-40 bg-red-50 flex items-center justify-center text-red-200">
+                            <FaUtensils size={32} />
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2 bg-white/90 text-red-600 px-2 py-1 rounded-full text-xs font-bold shadow-sm">
+                          ₹{item.price}
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-gray-800 group-hover:text-red-600 transition-colors">{item.name}</h3>
+                          <p className="text-gray-600 text-sm mt-1">{item.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center gap-1 text-yellow-400">
+                          <FaStar size={14} />
+                          <span className="text-gray-700 text-sm">{item.rating}</span>
+                        </div>
+                        <button 
+                          onClick={() => handleAddToCart(item)}
+                          className="text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-full transition-colors shadow-sm flex items-center gap-1"
+                        >
+                          <FaShoppingCart size={12} />
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
           ))}
         </div>
-      </main>
-      
-      {/* Floating Cart Button */}
-      <div className="fixed bottom-6 right-6">
-        <button className="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300">
-          <FaShoppingBasket className="text-2xl" />
-        </button>
       </div>
     </div>
   );
 };
 
-export default KitchenMenu;
+export default MenuPage;

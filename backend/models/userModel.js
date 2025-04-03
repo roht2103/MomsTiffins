@@ -17,8 +17,8 @@ const userSchema = new mongoose.Schema(
       default: "", 
     },
     subscribedMother: { 
-      type: String, 
-      default: "", 
+       email : {type :  String },
+       name : {type :  String}  ,
     },
     role: { 
       type: String, 
