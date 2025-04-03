@@ -16,12 +16,12 @@ import SignupClient from "./pages/SignupClient";
 import MotherSignin from "./pages/MotherSignin";
 import MotherSignup from "./pages/MotherSignup";
 import SSOCallbackMother from "./pages/SSOForMother";
-import KitchenMenu from "./pages/KitchenMenu"
+import KitchenMenu from "./pages/KitchenMenu";
 
 const Layout = () => (
   <div>
     <NavBar />
-    <main className="pt-16">
+    <main className="pt-6 bg-gray-50">
       {" "}
       {/* Adjust padding if NavBar overlaps content */}
       <Outlet />
@@ -63,7 +63,7 @@ const App = () => {
         <Route path="/signin-mother" element={<MotherSignin />} />
         <Route path="/signup-mother" element={<MotherSignup />} />
         <Route path="/profile-setup" element={<ProfileSetup />} />
-        <Route path="/menu/:id" element={<KitchenMenu/>}></Route>
+        <Route path="/menu/:id" element={<KitchenMenu />}></Route>
         <Route
           path="/sso-callback-for-mothers"
           element={<SSOCallbackMother />}

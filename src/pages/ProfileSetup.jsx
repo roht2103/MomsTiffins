@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,20 +16,21 @@ function showAlert(title, description) {
   );
 }
 
-const ProfileSetup = () => {
+const MotherProfileSetup = () => {
   const { user } = useUser();
   const navigate = useNavigate();
 
-  const [role, setRole] = useState(null);
   const [kitchenName, setKitchenName] = useState("");
-  const [location, setLocation] = useState("");
+  const [logoURL, setLogoURL] = useState("");
+  const [monthlyRate, setMonthlyRate] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [foodPreferences, setFoodPreferences] = useState("");
   const [speciality, setSpeciality] = useState("");
+  const [location, setLocation] = useState({
+    type: "Point",
+    coordinates: [-1, -1],
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingRole, setIsFetchingRole] = useState(true);
-
-  console.log("Role:", role);
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -42,9 +42,9 @@ const ProfileSetup = () => {
           }
         );
 
-        console.log("User Data:", response.data);
-
-        setRole(response.data.role || "client");
+        if (response.data.role !== "mother") {
+          navigate("/not-authorized"); // Redirect if not a mother
+        }
       } catch (error) {
         console.error("Error fetching user role:", error);
         showAlert("Error", "Failed to fetch user role.");
@@ -56,7 +56,31 @@ const ProfileSetup = () => {
     if (user) {
       fetchUserRole();
     }
-  }, [user]);
+  }, [user, navigate]);
+
+  // 📍 Get current location using Geolocation API
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      showAlert("Error", "Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ type: "Point", coordinates: [latitude, longitude] });
+
+        showAlert("Success", `Location set: (${latitude}, ${longitude})`);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        showAlert(
+          "Error",
+          "Failed to get location. Please allow location access."
+        );
+      }
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,20 +92,21 @@ const ProfileSetup = () => {
         email: user.primaryEmailAddress.emailAddress,
         location,
         mobileNumber,
-        foodPreferences,
         speciality,
         kitchenName,
-        role,
+        logoURL,
+        monthlyRate,
+        role: "mother",
       };
 
       await axios.post("http://localhost:5000/api/profile-setup", userData);
 
       showAlert(
         "Profile setup successful",
-        "Your profile has been created successfully."
+        "Your tiffin provider profile has been created successfully."
       );
 
-      navigate(role === "client" ? "/client-dashboard" : "/mother-dashboard");
+      navigate("/mother-dashboard");
     } catch (error) {
       console.error("Profile setup error:", error);
       showAlert(
@@ -103,7 +128,7 @@ const ProfileSetup = () => {
   }
 
   return (
-    <div className="flex items-center justify-center bg-gray-50 px-4">
+    <div className="flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <h1 className="text-3xl font-bold mb-2">Mother's Tiffin</h1>
@@ -113,43 +138,54 @@ const ProfileSetup = () => {
         </CardHeader>
         <CardContent>
           <h2 className="text-xl font-semibold text-center mb-6">
-            {role === "client"
-              ? "Food Lover Profile Setup"
-              : "Tiffin Provider Profile Setup"}
+            Tiffin Provider Profile Setup
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {role === "mother" && (
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Kitchen Name
-                </label>
-                <Input
-                  type="text"
-                  placeholder="Your kitchen name"
-                  value={kitchenName}
-                  onChange={(e) => setKitchenName(e.target.value)}
-                  required
-                />
-              </div>
-            )}
             <div>
-              <label className="block text-sm font-medium mb-2">
-                Your Location
-              </label>
               <Input
                 type="text"
-                placeholder="Your delivery address"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Your kitchen name"
+                value={kitchenName}
+                onChange={(e) => setKitchenName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Input
+                type="text"
+                placeholder="Your kitchen Logo URL"
+                value={logoURL}
+                onChange={(e) => setLogoURL(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <Input
+                type="number"
+                placeholder="Monthly Rate"
+                value={monthlyRate}
+                onChange={(e) => setMonthlyRate(e.target.value)}
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Mobile Number
+                Your Location (Latitude, Longitude)
               </label>
+              <Input
+                type="text"
+                value={`[${location.coordinates[1]}, ${location.coordinates[0]}]`}
+                readOnly
+              />
+              <Button onClick={handleGetLocation} className="mt-2 w-full">
+                Get Current Location 📍
+              </Button>
+            </div>
+
+            <div>
               <Input
                 type="tel"
                 placeholder="Your contact number"
@@ -159,32 +195,15 @@ const ProfileSetup = () => {
               />
             </div>
 
-            {role === "client" ? (
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Food Preferences (Optional)
-                </label>
-                <Input
-                  type="text"
-                  placeholder="E.g. Vegetarian, No spicy food"
-                  value={foodPreferences}
-                  onChange={(e) => setFoodPreferences(e.target.value)}
-                />
-              </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  speciality
-                </label>
-                <Input
-                  type="text"
-                  placeholder="E.g. Gujarati Food, Punjabi Dishes"
-                  value={speciality}
-                  onChange={(e) => setSpeciality(e.target.value)}
-                  required
-                />
-              </div>
-            )}
+            <div>
+              <Input
+                type="text"
+                placeholder="E.g. Gujarati Food, Punjabi Dishes"
+                value={speciality}
+                onChange={(e) => setSpeciality(e.target.value)}
+                required
+              />
+            </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Saving..." : "Save & Continue"}
@@ -206,4 +225,4 @@ const ProfileSetup = () => {
   );
 };
 
-export default ProfileSetup;
+export default MotherProfileSetup;

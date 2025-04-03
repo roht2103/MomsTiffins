@@ -62,7 +62,6 @@ const SignUpMother = () => {
           firstName,
           lastName,
           role: "mother",
-          profileComplete: false,
         });
 
         navigate("/profile-setup");
@@ -101,7 +100,6 @@ const SignUpMother = () => {
         firstName,
         lastName,
         role: "mother",
-        profileComplete: false,
       });
     } catch (err) {
       setError(err.errors?.[0]?.message || "Google sign up failed");
