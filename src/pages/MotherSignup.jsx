@@ -56,13 +56,12 @@ const SignUpMother = () => {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
 
-        await axios.post("http://localhost:5000/api/signup", {
+        await axios.post("http://localhost:5000/api/mother/signup", {
           clerkUserId: completeSignUp.createdUserId,
           email,
           firstName,
           lastName,
           role: "mother",
-          profileComplete: false,
         });
 
         navigate("/profile-setup");
@@ -95,13 +94,12 @@ const SignUpMother = () => {
       });
       console.log(verificationCode);
 
-      await axios.post("http://localhost:5000/api/signup", {
+      await axios.post("http://localhost:5000/api/mother/signup", {
         clerkUserId: completeSignUp.createdUserId,
         email,
         firstName,
         lastName,
         role: "mother",
-        profileComplete: false,
       });
     } catch (err) {
       setError(err.errors?.[0]?.message || "Google sign up failed");

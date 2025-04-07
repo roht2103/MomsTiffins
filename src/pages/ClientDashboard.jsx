@@ -71,7 +71,7 @@ const ClientDashboard = () => {
     try {
       setLoadingMothers(true);
       const response = await axios.get(
-        `http://localhost:5000/api/fetch-nearby-mothers?latitude=${latitude}&longitude=${longitude}`
+        `http://localhost:5000/api/get/fetch-nearby-mothers?latitude=${latitude}&longitude=${longitude}`
       );
       if (response.data.success) {
         setNearbyMothers(response.data.data);

@@ -30,33 +30,33 @@ const MotherProfileSetup = () => {
     coordinates: [-1, -1],
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isFetchingRole, setIsFetchingRole] = useState(true);
+  const [isFetchingRole, setIsFetchingRole] = useState(false);
 
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      try {
-        const response = await axios.post(
-          "http://localhost:5000/api/get-user",
-          {
-            email: user?.primaryEmailAddress?.emailAddress,
-          }
-        );
+  // useEffect(() => {
+  //   const fetchUserRole = async () => {
+  //     try {
+  //       const response = await axios.post(
+  //         "http://localhost:5000/api/get-user",
+  //         {
+  //           email: user?.primaryEmailAddress?.emailAddress,
+  //         }
+  //       );
 
-        if (response.data.role !== "mother") {
-          navigate("/not-authorized"); // Redirect if not a mother
-        }
-      } catch (error) {
-        console.error("Error fetching user role:", error);
-        showAlert("Error", "Failed to fetch user role.");
-      } finally {
-        setIsFetchingRole(false);
-      }
-    };
+  //       if (response.data.role !== "mother") {
+  //         navigate("/not-authorized"); // Redirect if not a mother
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user role:", error);
+  //       showAlert("Error", "Failed to fetch user role.");
+  //     } finally {
+  //       setIsFetchingRole(false);
+  //     }
+  //   };
 
-    if (user) {
-      fetchUserRole();
-    }
-  }, [user, navigate]);
+  //   if (user) {
+  //     fetchUserRole();
+  //   }
+  // }, [user, navigate]);
 
   // 📍 Get current location using Geolocation API
   const handleGetLocation = () => {
@@ -99,7 +99,7 @@ const MotherProfileSetup = () => {
         role: "mother",
       };
 
-      await axios.post("http://localhost:5000/api/profile-setup", userData);
+      await axios.post("http://localhost:5000/api/mother/profile-setup", userData);
 
       showAlert(
         "Profile setup successful",

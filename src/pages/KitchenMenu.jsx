@@ -58,7 +58,7 @@ const MenuPage = () => {
 
   const updateSubscription =async (e)=>{
 
-    const response = await axios.put("http://localhost:5000/api/updatesubscription", {
+    const response = await axios.put("http://localhost:5000/api/menu/updatesubscription", {
       kitchenName : kitchen.kitchenName ,
       kitchenEmail :  kitchen.email ,
       clientEmail : user.primaryEmailAddress.emailAddress 

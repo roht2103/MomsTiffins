@@ -12,6 +12,7 @@ import {
     handleGetUser,
     handleGetUserProfile,
     handleMotherProfileSetup,
+    handleUpdateStatus,
     handleUpdateMainMenu,
   } from "../controller/motherController.js";
   
@@ -33,7 +34,8 @@ router.post("/user-profile", handleGetUserProfile);
 router.post("/profile-setup", handleMotherProfileSetup);
 router.post("/update-todays-menu", handleUpdateTodaysMenu);
 router.get("/get-todays-menu/:email", handleGetTodaysMenu);
-router.post("/update-main-menu", handleUpdateMainMenu);
+router.get("/update-status", handleUpdateStatus);
+// router.post("/update-main-menu", handleUpdateMainMenu);
 
 
 //fetching nearby mother 

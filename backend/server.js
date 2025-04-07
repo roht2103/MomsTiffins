@@ -24,9 +24,9 @@ mongoose
 
 app.use("/api/createuser", router);
 app.use("/api/user", router);
-app.use("/api", router);
+app.use("/api/menu", router);
 //fetch nearby mothers
-app.use("/api", router)
+app.use("/api/get", router)
 
 app.get("/", (req, res) => {
   res.end("Hello there!!!");
@@ -34,12 +34,13 @@ app.get("/", (req, res) => {
 
 app.use("/api", router); 
 
-app.use("/api/signup", router);
-app.use("/api/get-user", router);
-app.use("/api/user-profile", router);
+app.use("/api/mother", router);
+app.use("/api/mother", router);
+app.use("/api/mother", router);
+app.use("/api/mother/status", router);
 app.use("/api/profile-setup", router);
-app.use("/update-todays-menu", router);
-app.use("/get-todays-menu/:email", router);
+app.use("/api/mother", router);
+app.use("/api/mother", router);
 app.use("api/update-main-menu", router);
 app.use("/api/get-main-menu", router);
 

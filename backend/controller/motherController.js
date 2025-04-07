@@ -89,7 +89,7 @@ export const handleMotherProfileSetup = async (req, res) => {
       logoURL,
       role,
     } = req.body;
-    const user = await Mother.findOne({ $or: [{ clerkUserId }, { email }] });
+    const user = await Mother.findOne({ email  });
 
     if (!user) {
       return res.status(404).json({ message: "Client not found" });
@@ -184,5 +184,50 @@ export const handleUpdateMainMenu = async (req, res) => {
   } catch (error) {
     console.error("Error updating main menu:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export const handleUpdateStatus = async (req, res) => {
+  try {
+    const { email, isActive } = req.body;
+
+    // Validate input
+    if (!email || typeof isActive !== 'boolean') {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and isActive (boolean) are required'
+      });
+    }
+
+    // Update the mother's status in the database
+    const updatedMother = await Mother.findOneAndUpdate(
+      { email },
+      { isActive },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedMother) {
+      return res.status(404).json({
+        success: false,
+        message: 'Mother not found with the provided email'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Status updated to ${isActive ? 'online' : 'offline'}`,
+      data: {
+        isActive: updatedMother.isActive
+      }
+    });
+
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error while updating status',
+      error: error.message
+    });
   }
 };
